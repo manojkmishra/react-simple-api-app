@@ -8,67 +8,105 @@ function App() {
     city: "",
     country: "",
   });
-  const [details, setDetails] = useState({
-    temp: "TEMPRATURE",
-    humidity: "HUMIDITY",
-    cloud: "CLOUD",
-    wind_speed: "WIND SPEED",
-    wind_dir: "WIND DIRECTION",
-    condition: "CONDITION",
-    img: "",
+  const [clickedButton, setClicked] = useState("");
+  const [body1, setBody1] = useState({
+    provisioned_data_profile: {
+      uuid: "0f81e3e2-f3a9-409d-8166-c56a1ac8cf46-----1",
+    },
+    policy_data_profile: {
+      uuid: "ff39172d-b564-4672-aca9-791d0d251fe7----1",
+    },
   });
 
   useEffect(() => {
-    console.log("City is now: ", cityName);
-  }, [cityName]);
+    console.log("imsi is now: ", cityName);
+    console.log("body: ", body1);
+  }, [cityName, body1]);
 
   function handleAPI(event) {
     event.preventDefault();
     const city = event.target.city_name.value;
     setCity(city);
 
+    console.log("buttonclick", clickedButton);
+    if (clickedButton === "firstButton") {
+      let body1 = {
+        provisioned_data_profile: {
+          uuid: "0f81e3e2-f3a9-409d-8166-c56a1ac8cf46-----1",
+        },
+        policy_data_profile: {
+          uuid: "ff39172d-b564-4672-aca9-791d0d251fe7-----1",
+        },
+      };
+      setBody1(body1);
+    } else if (clickedButton === "secondButton") {
+      let body2 = {
+        provisioned_data_profile: {
+          uuid: "0f81e3e2-f3a9-409d-8166-c56a1ac8cf46-----2",
+        },
+        policy_data_profile: {
+          uuid: "ff39172d-b564-4672-aca9-791d0d251fe7----2",
+        },
+      };
+      setBody1(body2);
+    } else {
+    }
+
+    var session_url = "https://172.22.70.28/core/pls/api/1/auth/login";
     axios
-      .get(
-        "http://api.weatherapi.com/v1/current.json?key=4f2aa6c0f2bf4bc186151423232205&q=" +
-          city +
-          "&aqi=no"
-      )
-      .then((res) => {
-        console.log('ajay api response',res.data);
-        return (
-          setDetails({
-            temp: res.data.current.temp_c,
-            humidity: res.data.current.humidity,
-            cloud: res.data.current.cloud,
-            wind_dir: res.data.current.wind_dir,
-            condition: res.data.current.condition.text,
-            wind_speed: res.data.current.wind_kph,
-            img: res.data.current.condition.icon,
-          }),
-          setCity({
-            city: res.data.location.name,
-            country: res.data.location.country,
-          })
-        );
+      .post(session_url, {
+        username: "admin",
+        password: "Super4dmin!",
       })
-      .catch((err) => console.log(err.message));
+      .then(function (response) {
+        console.log("Authenticated", response);
+        console.log("Token", response.data.access_token);
+
+        const headers = {
+          Authorization: `Bearer ${response.data.access_token}`,
+        };
+        axios
+          .patch(
+            `https://172.22.70.28/core/udr/api/1/provisioning/supis/imsi-${city}`,
+            body1,
+            { headers }
+          )
+          .then((response1) => {
+            console.log("res--", response1);
+            return setCity({
+              city: response1.data.supi,
+              country: response1.data.status,
+            });
+          })
+          .catch((error) => {
+            console.error("There was an error!", error);
+          });
+      })
+      .catch(function (error) {
+        console.log("Error on Authentication");
+      });
+    //----------------------------------
   }
 
   return (
     <div className="App">
       <header className="App-header">
-        <h1>Wheather App using ReactJS & Wheather API</h1>
+        <h1>Boingo Priority 5G PASS</h1>
         <form onSubmit={handleAPI}>
           <TextField
             id="outlined-basic"
             color="warning"
             name="city_name"
-            label="City/State/Country"
+            label="IMSI"
             style={{ background: "white", width: "580px" }}
             variant="filled"
           />
 
           <Button
+            onClick={() => {
+              setClicked("firstButton");
+            }}
+            id="submit1"
             type="submit"
             style={{
               paddingTop: "15px",
@@ -78,7 +116,23 @@ function App() {
             color="warning"
             variant="contained"
           >
-            Check
+            Profile - A
+          </Button>
+          <Button
+            onClick={() => {
+              setClicked("secondButton");
+            }}
+            id="submit2"
+            type="submit"
+            style={{
+              paddingTop: "15px",
+              paddingBottom: "15px",
+              marginLeft: "10px",
+            }}
+            color="warning"
+            variant="contained"
+          >
+            Profile -B
           </Button>
         </form>
 
@@ -87,43 +141,17 @@ function App() {
             <Box>
               <br />
               <span className="my_span" style={{ color: "#ED6C02" }}>
-                City:{" "}
+                IMSI:{" "}
               </span>
               {cityName.city}
-            </Box>
-            <Box>
-              <br />
-              <span className="my_span" style={{ color: "#ED6C02" }}>
-                Country:{" "}
-              </span>
-              {cityName.country}
-            </Box>
-            <Box>
-              <p>{details.condition}</p>
-              <img src={details.img} width={"150px"} alt="" />
             </Box>
           </Grid>
 
           <Grid item sm={6}>
             <br />
             <Box>
-              <span className="my_span">Temperature: </span>
-              {details.temp} C
-            </Box>
-            <br />
-            <Box>
-              <span className="my_span">Humidity: </span>
-              {details.humidity}
-            </Box>
-            <br />
-            <Box>
-              <span className="my_span">Wind Speed: </span>
-              {details.wind_speed} KPH
-            </Box>
-            <br />
-            <Box>
-              <span className="my_span">Wind Direction: </span>
-              {details.wind_dir}
+              <span className="my_span">STATUS: </span>
+              {cityName.country}
             </Box>
             <br />
           </Grid>
