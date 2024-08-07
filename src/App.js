@@ -11,10 +11,10 @@ function App() {
   const [clickedButton, setClicked] = useState("");
   const [body1, setBody1] = useState({
     provisioned_data_profile: {
-      uuid: "0f81e3e2-f3a9-409d-8166-c56a1ac8cf46-----1",
+      uuid: "0f81e3e2-f3a9-409d-8166-c56a1ac8cf46",
     },
     policy_data_profile: {
-      uuid: "ff39172d-b564-4672-aca9-791d0d251fe7----1",
+      uuid: "ff39172d-b564-4672-aca9-791d0d251fe7",
     },
   });
 
@@ -32,20 +32,20 @@ function App() {
     if (clickedButton === "firstButton") {
       let body1 = {
         provisioned_data_profile: {
-          uuid: "0f81e3e2-f3a9-409d-8166-c56a1ac8cf46-----1",
+          uuid: "0f81e3e2-f3a9-409d-8166-c56a1ac8cf46",
         },
         policy_data_profile: {
-          uuid: "ff39172d-b564-4672-aca9-791d0d251fe7-----1",
+          uuid: "ff39172d-b564-4672-aca9-791d0d251fe7",
         },
       };
       setBody1(body1);
     } else if (clickedButton === "secondButton") {
       let body2 = {
         provisioned_data_profile: {
-          uuid: "0f81e3e2-f3a9-409d-8166-c56a1ac8cf46-----2",
+          uuid: "0f81e3e2-f3a9-409d-8166-c56a1ac8cf46",
         },
         policy_data_profile: {
-          uuid: "ff39172d-b564-4672-aca9-791d0d251fe7----2",
+          uuid: "ff39172d-b564-4672-aca9-791d0d251fe7",
         },
       };
       setBody1(body2);
